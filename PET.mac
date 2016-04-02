@@ -1,4 +1,4 @@
-ttyoff : true; 
+/*ttyoff : true; */
 load ("nchrpl");
 
 pinverse(n) :=
@@ -19,21 +19,17 @@ pinverse(n) :=
 
 
 seriesSolution(truncOrder, initVec, F_faug2, bita) :=
- block ([initVec_aug, summand, j, ret, S_lst],
+ block ([initVec_aug, summand, j, ret, S_lst, b, expCoeff],
 	initVec_aug : addrow(initVec, [ksi]),
 	summand : 0,
 	ret : 0,
         S_lst : make_array(fixnum, truncOrder+1),
+        expCoeff : limit((1-exp(b*t))/(-b),b,bita),
 	for j:0 thru truncOrder do 
 	(
-	  if notequal(bita,0) then
-	   summand:1/(j!)*(((1-exp(bita*t))/(-bita))^j)
+	  summand:1/(j!)*(expCoeff^j)
 	         *S(j,initVec_aug, F_faug2,S_lst)
-                 .initVec_aug
-	  else
-	   summand:1/(j!)*t^j
-	         *S(j,initVec_aug, F_faug2,S_lst)
-                 .initVec_aug,	
+                 .initVec_aug,
 	  ret:ret+summand
 	),
 	return(exp(bita*t)*ret)
@@ -88,10 +84,14 @@ extractColRange(F, em, en) :=
 	return(tmp)
 )$
 
-F_org0 : matrix([0],[1]);
-F_org1 : matrix([1,1],[1,0]);
-F_org2 : matrix([0,1/2,1/2,0],[0,0,0,-1]);
-initVec : matrix([0.1],[0.2]);
+F_org0 : matrix([0],[0],[0],[0]);
+F_org1 : matrix([0,1,0,0],[-1,0,0,0],[0,0,0,1],[0,0,-1,0]);
+F_org2 : zeromatrix(4,16);
+F_org2[2,3] : -1;
+F_org2[2,9] : -1;
+F_org2[4,1] : -1;
+F_org2[4,11] : 1;
+initVec : matrix([0.1],[0.2],[0.3],[0.4]);
 truncOrder : 7;
 
 n : (matrix_size(initVec))[1];
